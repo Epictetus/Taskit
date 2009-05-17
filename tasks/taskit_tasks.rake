@@ -13,11 +13,3 @@ namespace :db do
     end  
   end 
 end 
-
-namespace :taskit do  
-  desc "Prints out the word 'hello'"  
-  
-  task :hello => :environment do  
-    puts "hello!"  
-  end 
-end

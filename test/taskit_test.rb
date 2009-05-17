@@ -166,7 +166,7 @@ class TaskitTest < ActiveSupport::TestCase
     # verify that the task is not running at the mo
     assert_equal false, tasks(:success_1_task).is_running
     
-    # call the session cleaner upper.
+    # call the task
     Taskit.send(:run_scheduled_task, scheduled_tasks(:success_1_scheduled_task), Time.now)
     
     # this should run, because it never has, and it's scheduled to run every half an hour
