@@ -1,0 +1,20 @@
+success_1_task:
+  id: 1
+  name: success 1
+  class_name: Success1
+  method_name: go
+  is_running: 0
+
+success_2_task:
+  id: 2
+  name: success 2
+  class_name: Success2
+  method_name: go
+  is_running: 0
+    
+failing_task:
+  id: 3
+  name: fail
+  class_name: Fail
+  method_name: fail
+  is_running: 0

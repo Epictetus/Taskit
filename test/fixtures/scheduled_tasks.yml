@@ -1,0 +1,17 @@
+success_1_scheduled_task:
+  id: 1
+  task_id: 1
+  frequency_id: 2
+  time_of_day: 0 
+
+success_2_scheduled_task:
+  id: 2
+  task_id: 2
+  frequency_id: 1
+  time_of_day: 0
+
+failing_scheduled_task:
+  id: 3
+  task_id: 3
+  frequency_id: 3
+  time_of_day: 0

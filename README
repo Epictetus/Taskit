@@ -1,0 +1,79 @@
+Taskit - Overview
+=================
+
+Taskit is a rails plugin to allow you to schedule simple tasks for your rails app.
+
+Tasks can be scheduled at varying frequencies or times of day.
+
+To schedule tasks, all you need to do is add the relevant entries into the tasks and scheduled_tasks database tables (that this plugin creates).  At the scheduled times, the specified (class) method of the appropriate class will be called.
+
+You will also need to set up a something to call the task runner periodically (such as a cron job).
+
+
+Creating the database structure
+=============================
+
+To create database structure required for this plugin, just run the rake task like this:
+rake db:migrate:taskit
+
+Note: This will create tables called 'tasks', 'scheduled_tasks' and 'scheduled_task_logs'. If these names conflict with other tables in your database, please just adjust the names of the tables in this plugin's lib/db/migrate folder, and the names of the corresponding models in app/models.
+
+
+Cron job
+========
+
+You need to set up something to call the task runner periodically.  This can be achieved by a cron-invoked script, which uses script/runner.  
+
+For, example, you might have a script like this (don't forget to give the cron user execute permissions on this file with chmod +x):
+
+#run_scheduled_tasks.sh 
+<path to ruby>/ruby <path to rails project>/script/runner -e production "Taskit.run_scheduled_tasks"
+#end of file
+
+...and a crontab entry to call that script every 10 mins (create with crontab -e):
+*/10 * * * * <path to script>/run_scheduled_tasks.sh >><path to where you want to write logs>/taskit.log 2>&1
+
+
+Examples
+========
+
+1. This will schedule a task which calls the clean_up method of the SessionCleaner class, every half an hour:
+
+session_cleaner_task = Task.create(:name => "clean up sessions", :class_name => "SessionCleaner", :method_name => "clean_up")
+ScheduledTask.create(:task_id => session_cleaner_task.id, :frequency_id => Frequency::HALF_HOURLY)
+
+2. This will schedule a task which calls the delete_old_locks method of the LockManager class every time the scheduler is invoked:
+
+delete_old_locks_task = Task.create(:name => "delete locks", :class_name => "LockManager", :method_name => "delete_old_locks")
+ScheduledTask.create(:task_id => delete_old_locks_task.id, :frequency_id => Frequency::ASAP)
+
+3. This will schedule a task to call the send_invoices method of the InvoiceManager class ever day at 3 am:
+
+invoice_sender_task = Task.create(:name => "mail invoices", :class => "InvoiceManager", :method_name => "send_invoices")
+ScheduledTask.create(:task_id => invoice_sender_task.id, :frequency_id => Frequency::DAILY, :time_of_day => 180)
+
+
+Notes
+=====
+
+See lib/app/models/Frequency.rb for all the available frequencies.
+
+The ScheduledTask#time_of_day is specified in minutes past midnight. It is ignored for frequencies more frequent than daily. If it's omitted for frequencies of daily or less, then a default of midnight is used.
+
+You can set up the tasks and scheduled_tasks wherever you like in your rails app (e.g. a migration, or a yaml file which you use for seeding the database).  
+
+The tasks set up with a frequency of ASAP will run every time the scheduled task runner is invoked, i.e. every 10 mins if you use the example crontab entry above.
+
+At the moment, Taskit only supports execution of class methods (i.e. not instance methods).
+
+Coming soon: a rake task to create and schedule tasks.  
+
+
+Copyright
+=========
+Copyright (c) 2009 Swirrl IT Limited, released under the MIT license
+
+
+Contact
+=======
+If you want to contribute, or you've got any questions, please get in touch via: taskit@swirrl.com
